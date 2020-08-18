@@ -1,0 +1,53 @@
+/*
+ * Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+/dts-v1/;
+
+#include "am33xx.dtsi"
+#include "am335x-bone-common.dtsi"
+#include "am335x-boneblack-common.dtsi"
+
+/ {
+	model = "TI AM335x BeagleBone Black";
+	compatible = "ti,am335x-bone-black", "ti,am335x-bone", "ti,am33xx";
+};
+
+&cpu0_opp_table {
+	/*
+	 * All PG 2.0 silicon may not support 1GHz but some of the early
+	 * BeagleBone Blacks have PG 2.0 silicon which is guaranteed
+	 * to support 1GHz OPP so enable it for PG 2.0 on this board.
+	 */
+	oppnitro-1000000000 {
+		opp-supported-hw = <0x06 0x0100>;
+	};
+};
+
+/* pinmux i2c1 */
+&am33xx_pinmux {
+	i2c1_pins: pinmux_i2c1_pins {
+		pinctrl-single,pins = <
+			AM33XX_IOPAD(0x958, PIN_INPUT_PULLUP | MUX_MODE2) /* spi0_d1.i2c1_sda */
+			AM33XX_IOPAD(0x95c, PIN_INPUT_PULLUP | MUX_MODE2) /* spi0_cs0.i2c1_scl */
+		>;
+	};
+};
+
+/* habilitamos el bus i2c1 */
+&i2c1 {
+	status = "okay";
+	pinctrl-names = "default";
+	clock-frequency = <100000>;
+	pinctrl-0 = <&i2c1_pins>;
+
+	/* aca declaramos nuestros devices */
+	esp32: esp32@50 {
+		compatible = "mse,esp32";
+		reg = <0x50>;
+	};
+};
+
